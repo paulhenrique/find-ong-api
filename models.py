@@ -33,3 +33,13 @@ class User(Base):
 	email = Column(String)
 	socialUid = Column(String)
 
+
+# Database model
+class Comments(Base):
+	__tablename__ = "comments"
+	id = Column(Integer, primary_key=True, index=True)
+	userId = Column(Integer) # Todo: consertar relacionamento
+	comment = Column(String)
+	postId = Column(Integer) # Todo: consertar relacionamento
+	timeStamp = Column(String)
+

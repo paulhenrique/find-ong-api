@@ -52,6 +52,8 @@ async def delete_item(item_id: int, db: Session = Depends(get_db)):
     db.commit()
     return 
 
+# CRUD DE INSTITUIÇÕES
+
 # API endpoint to create an Institution
 @app.post("/institutions/", response_model=InstitutionResponse)
 async def create_Institution(institution: InstitutionCreate, db: Session = Depends(get_db)):

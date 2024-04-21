@@ -68,3 +68,23 @@ class UserResponse(BaseModel):
 	name: str
 	email: str
 	socialUid: str
+	
+class CommentCreate(BaseModel):
+	userId: str
+	comment: str
+	postId: str
+	timeStamp: str
+	
+# Pydantic model for request data
+class CommentUpdate(BaseModel):
+	userId: str
+	comment: str
+	postId: str
+	timeStamp: str
+
+# Pydantic model for response data
+class CommentResponse(BaseModel):
+	userId: str
+	comment: str
+	postId: str
+	timeStamp: str
