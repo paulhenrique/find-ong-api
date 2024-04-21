@@ -1,10 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List  # Import the List type
-from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate, CommentCreate, CommentResponse, CommentUpdate, PostCreate, PostResponse, PostUpdate
-from models import Item, Institution, User, Comment, Post
+from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate, CommentCreate, CommentResponse, CommentUpdate, PostCreate, PostResponse, PostUpdate, PostLikesCreate, PostLikesResponse, PostLikesUpdate
+from models import Item, Institution, User, Comment, Post, PostLikes
 from database import get_db
-
 
 # FastAPI app instance
 app = FastAPI()
@@ -233,6 +232,51 @@ async def delete_post(post_id: int, db: Session = Depends(get_db)):
     db.delete(db_post)
     db.commit()
     return
+
+
+# API endpoint to create an postLike
+@app.post("/postLikes/", response_model=PostLikesResponse)
+async def create_postLike(postLike: PostLikesCreate, db: Session = Depends(get_db)):
+	db_postLike = PostLikes(**postLike.dict())
+	db.add(db_postLike)
+	db.commit()
+	db.refresh(db_postLike)
+	return db_postLike
+
+# API endpoint to update an postLike by ID
+@app.put("/postLikes/{postLike_id}", response_model=PostLikesResponse)
+async def update_postLike(postLike_id: int, postLike: PostLikesUpdate, db: Session = Depends(get_db)):
+    updated_postLike = db.query(PostLikes).filter(PostLikes.id == postLike_id)
+    updated_postLike.first()
+    if updated_postLike is None:
+        raise HTTPException(status_code=404, detail="PostLikes not found")
+    updated_postLike.update(postLike.dict(), synchronize_session=False)
+    db.commit()
+    return updated_postLike.first()  # Refresh and return updated postLike
+
+# API endpoint to read an postLike by ID
+@app.get("/postLikes/{postLike_id}", response_model=PostLikesResponse)
+async def read_postLike(postLike_id: int, db: Session = Depends(get_db)):
+	db_postLike = db.query(PostLikes).filter(PostLikes.id == postLike_id).first()
+	if db_postLike is None:
+		raise HTTPException(status_code=404, detail="PostLikes not found")
+	return db_postLike
+
+# API endpoint to retrieve all postLikes
+@app.get("/postLikes/", response_model=List[PostLikesResponse])
+async def read_postLikes(db: Session = Depends(get_db)):
+    postLikes = db.query(PostLikes).all()
+    return postLikes
+
+@app.delete("/postLikes/{postLike_id}", status_code=204)
+async def delete_postLike(postLike_id: int, db: Session = Depends(get_db)):
+    db_postLike = db.query(PostLikes).filter(PostLikes.id == postLike_id).first()
+    if db_postLike is None:
+        raise HTTPException(status_code=404, detail="PostLikes not found")
+    db.delete(db_postLike)
+    db.commit()
+    return 
+
 
 if __name__ == "__main__":
 	import uvicorn

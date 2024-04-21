@@ -110,19 +110,19 @@ class PostResponse(BaseModel):
 	institutionId: str
 	timeStamp: str
 
-class PostCreate(BaseModel):
+class PostLikesCreate(BaseModel):
 	userId: str
 	postId: str
 	timeStamp: str
 	
 # Pydantic model for request data
-class PostUpdate(BaseModel):
+class PostLikesUpdate(BaseModel):
 	userId: str
 	postId: str
 	timeStamp: str
 
 # Pydantic model for response data
-class PostResponse(BaseModel):
+class PostLikesResponse(BaseModel):
 	id: int
 	userId: str
 	postId: str
