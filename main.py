@@ -1,54 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from pydantic import BaseModel
+from sqlalchemy.orm import Session
 from typing import List  # Import the List type
+from schemas import ItemCreate, ItemUpdate, ItemResponse
+from database import get_db
+from models import Item
 
 # FastAPI app instance
 app = FastAPI()
-
-# Database setup
-DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-
-# Database model
-class Item(Base):
-	__tablename__ = "items"
-	id = Column(Integer, primary_key=True, index=True)
-	name = Column(String, index=True)
-	description = Column(String)
-
-
-# Create tables
-Base.metadata.create_all(bind=engine)
-
-# Dependency to get the database session
-def get_db():
-	db = SessionLocal()
-	try:
-		yield db
-	finally:
-		db.close()
-
-# Pydantic model for request data
-class ItemCreate(BaseModel):
-	name: str
-	description: str
-	
-# Pydantic model for request data
-class ItemUpdate(BaseModel):
-	name: str
-	description: str
-
-# Pydantic model for response data
-class ItemResponse(BaseModel):
-	id: int
-	name: str
-	description: str
 
 # API endpoint to create an item
 @app.post("/items/", response_model=ItemResponse)
@@ -93,8 +51,11 @@ async def delete_item(item_id: int, db: Session = Depends(get_db)):
     db.commit()
     return 
 
+
+
+
 if __name__ == "__main__":
 	import uvicorn
 
 	# Run the FastAPI application using Uvicorn
-	uvicorn.run(app, host="127.0.0.1", port=8000)
+	uvicorn.run(app, host="127.0.0.1", port=3380)
