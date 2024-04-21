@@ -52,3 +52,12 @@ class Post(Base):
 	text = Column(String)
 	timeStamp = Column(String)
 
+
+# Database model
+class PostLikes(Base):
+	__tablename__ = "postLikes"
+	id = Column(Integer, primary_key=True, index=True)
+	userId = Column(Integer) # Todo: consertar relacionamento
+	postId = Column(Integer) # Todo: consertar relacionamento
+	timeStamp = Column(String)
+
