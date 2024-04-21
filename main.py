@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List  # Import the List type
-from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate 
-from models import Item, Institution, User
+from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate, CommentCreate, CommentResponse, CommentUpdate 
+from models import Item, Institution, User, Comment
 from database import get_db
 
 
@@ -142,6 +142,49 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.commit()
     return 
 
+
+# API endpoint to create an comment
+@app.post("/comments/", response_model=CommentResponse)
+async def create_comment(comment: CommentCreate, db: Session = Depends(get_db)):
+	db_comment = Comment(**comment.dict())
+	db.add(db_comment)
+	db.commit()
+	db.refresh(db_comment)
+	return db_comment
+
+# API endpoint to update an comment by ID
+@app.put("/comments/{comment_id}", response_model=CommentResponse)
+async def update_comment(comment_id: int, comment: CommentUpdate, db: Session = Depends(get_db)):
+    updated_comment = db.query(Comment).filter(Comment.id == comment_id)
+    updated_comment.first()
+    if updated_comment is None:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    updated_comment.update(comment.dict(), synchronize_session=False)
+    db.commit()
+    return updated_comment.first()  # Refresh and return updated comment
+
+# API endpoint to read an comment by ID
+@app.get("/comments/{comment_id}", response_model=CommentResponse)
+async def read_comment(comment_id: int, db: Session = Depends(get_db)):
+	db_comment = db.query(Comment).filter(Comment.id == comment_id).first()
+	if db_comment is None:
+		raise HTTPException(status_code=404, detail="Comment not found")
+	return db_comment
+
+# API endpoint to retrieve all comments
+@app.get("/comments/", response_model=List[CommentResponse])
+async def read_comments(db: Session = Depends(get_db)):
+    comments = db.query(Comment).all()
+    return comments
+
+@app.delete("/comments/{comment_id}", status_code=204)
+async def delete_comment(comment_id: int, db: Session = Depends(get_db)):
+    db_comment = db.query(Comment).filter(Comment.id == comment_id).first()
+    if db_comment is None:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    db.delete(db_comment)
+    db.commit()
+    return 
 
 
 if __name__ == "__main__":

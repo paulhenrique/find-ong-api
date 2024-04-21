@@ -35,7 +35,7 @@ class User(Base):
 
 
 # Database model
-class Comments(Base):
+class Comment(Base):
 	__tablename__ = "comments"
 	id = Column(Integer, primary_key=True, index=True)
 	userId = Column(Integer) # Todo: consertar relacionamento
