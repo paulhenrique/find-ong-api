@@ -51,4 +51,20 @@ class InstitutionResponse(BaseModel):
 	visitTime: str
 	visitDates: str
 	
+class UserCreate(BaseModel):
+	name: str
+	email: str
+	socialUid: str
+	
+# Pydantic model for request data
+class UserUpdate(BaseModel):
+	name: str
+	email: str
+	socialUid: str
 
+# Pydantic model for response data
+class UserResponse(BaseModel):
+	id: int
+	name: str
+	email: str
+	socialUid: str

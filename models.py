@@ -23,3 +23,13 @@ class Institution(Base):
 	created = Column(String)
 	visitTime = Column(String)
 	visitDates = Column(String)
+
+
+# Database model
+class User(Base):
+	__tablename__ = "users"
+	id = Column(Integer, primary_key=True, index=True)
+	name = Column(String, index=True)
+	email = Column(String)
+	socialUid = Column(String)
+
