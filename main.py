@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List  # Import the List type
-from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate, CommentCreate, CommentResponse, CommentUpdate, PostCreate, PostResponse, PostUpdate, PostLikesCreate, PostLikesResponse, PostLikesUpdate
-from models import Item, Institution, User, Comment, Post, PostLikes
+from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate, CommentCreate, CommentResponse, CommentUpdate, PostCreate, PostResponse, PostUpdate, PostLikesCreate, PostLikesResponse, PostLikesUpdate, UserFavoritesCreate, UserFavoritesResponse, UserFavoritesUpdate
+from models import Item, Institution, User, Comment, Post, PostLikes, UserFavorites
 from database import get_db
 
 # FastAPI app instance
@@ -274,6 +274,50 @@ async def delete_postLike(postLike_id: int, db: Session = Depends(get_db)):
     if db_postLike is None:
         raise HTTPException(status_code=404, detail="PostLikes not found")
     db.delete(db_postLike)
+    db.commit()
+    return 
+
+
+# API endpoint to create an userFavorites
+@app.post("/userFavorites/", response_model=UserFavoritesResponse)
+async def create_userFavorites(userFavorites: UserFavoritesCreate, db: Session = Depends(get_db)):
+	db_userFavorites = UserFavorites(**userFavorites.dict())
+	db.add(db_userFavorites)
+	db.commit()
+	db.refresh(db_userFavorites)
+	return db_userFavorites
+
+# API endpoint to update an userFavorites by ID
+@app.put("/userFavorites/{userFavorites_id}", response_model=UserFavoritesResponse)
+async def update_userFavorites(userFavorites_id: int, userFavorites: UserFavoritesUpdate, db: Session = Depends(get_db)):
+    updated_userFavorites = db.query(UserFavorites).filter(UserFavorites.id == userFavorites_id)
+    updated_userFavorites.first()
+    if updated_userFavorites is None:
+        raise HTTPException(status_code=404, detail="UserFavorites not found")
+    updated_userFavorites.update(userFavorites.dict(), synchronize_session=False)
+    db.commit()
+    return updated_userFavorites.first()  # Refresh and return updated userFavorites
+
+# API endpoint to read an userFavorites by ID
+@app.get("/userFavorites/{userFavorites_id}", response_model=UserFavoritesResponse)
+async def read_userFavorites(userFavorites_id: int, db: Session = Depends(get_db)):
+	db_userFavorites = db.query(UserFavorites).filter(UserFavorites.id == userFavorites_id).first()
+	if db_userFavorites is None:
+		raise HTTPException(status_code=404, detail="UserFavorites not found")
+	return db_userFavorites
+
+# API endpoint to retrieve all userFavorites
+@app.get("/userFavorites/", response_model=List[UserFavoritesResponse])
+async def read_userFavorites(db: Session = Depends(get_db)):
+    userFavorites = db.query(UserFavorites).all()
+    return userFavorites
+
+@app.delete("/userFavorites/{userFavorites_id}", status_code=204)
+async def delete_userFavorites(userFavorites_id: int, db: Session = Depends(get_db)):
+    db_userFavorites = db.query(UserFavorites).filter(UserFavorites.id == userFavorites_id).first()
+    if db_userFavorites is None:
+        raise HTTPException(status_code=404, detail="UserFavorites not found")
+    db.delete(db_userFavorites)
     db.commit()
     return 
 

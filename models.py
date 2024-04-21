@@ -61,3 +61,12 @@ class PostLikes(Base):
 	postId = Column(Integer) # Todo: consertar relacionamento
 	timeStamp = Column(String)
 
+
+# Database model
+class UserFavorites(Base):
+	__tablename__ = "userFavorites"
+	id = Column(Integer, primary_key=True, index=True)
+	userId = Column(Integer) # Todo: consertar relacionamento
+	institutionId = Column(Integer) # Todo: consertar relacionamento
+
+

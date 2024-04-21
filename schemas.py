@@ -127,3 +127,18 @@ class PostLikesResponse(BaseModel):
 	userId: str
 	postId: str
 	timeStamp: str
+	
+class UserFavoritesCreate(BaseModel):
+	userId: str
+	InstitutionId: str
+	
+# Pydantic model for request data
+class UserFavoritesUpdate(BaseModel):
+	userId: str
+	InstitutionId: str
+
+# Pydantic model for response data
+class UserFavoritesResponse(BaseModel):
+	id: int
+	userId: str		
+	InstitutionId: str
