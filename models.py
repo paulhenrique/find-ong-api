@@ -42,4 +42,13 @@ class Comment(Base):
 	comment = Column(String)
 	postId = Column(Integer) # Todo: consertar relacionamento
 	timeStamp = Column(String)
+	
+# Database model
+class Post(Base):
+	__tablename__ = "posts"
+	id = Column(Integer, primary_key=True, index=True)
+	userId = Column(Integer) # Todo: consertar relacionamento
+	institutionId = Column(Integer) # Todo: consertar relacionamento
+	text = Column(String)
+	timeStamp = Column(String)
 

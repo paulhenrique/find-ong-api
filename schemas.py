@@ -88,3 +88,24 @@ class CommentResponse(BaseModel):
 	comment: str
 	postId: str
 	timeStamp: str
+	
+class PostCreate(BaseModel):
+	userId: str
+	text: str
+	institutionId: str
+	timeStamp: str
+	
+# Pydantic model for request data
+class PostUpdate(BaseModel):
+	userId: str
+	text: str
+	institutionId: str
+	timeStamp: str
+
+# Pydantic model for response data
+class PostResponse(BaseModel):
+	id: int
+	userId: str
+	text: str
+	institutionId: str
+	timeStamp: str
