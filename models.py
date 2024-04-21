@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+
 Base = declarative_base()
 
 # Database model
@@ -12,15 +13,13 @@ class Item(Base):
 
 # Database model
 class Institution(Base):
-	__tablename__ = "institution"
+	__tablename__ = "institutions"
 	id = Column(Integer, primary_key=True, index=True)
 	name = Column(String, index=True)
 	address = Column(String)
 	latitude = Column(String)
 	longitude = Column(String)
-	responsibleUserId = Column(Integer)
+	responsibleUserId = Column(Integer) # Todo: consertar relacionamento
 	created = Column(String)
 	visitTime = Column(String)
 	visitDates = Column(String)
-
-	

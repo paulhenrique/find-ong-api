@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List  # Import the List type
-from schemas import ItemCreate, ItemUpdate, ItemResponse
+from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse 
+from models import Item, Institution
 from database import get_db
-from models import Item
+
 
 # FastAPI app instance
 app = FastAPI()
@@ -48,6 +49,49 @@ async def delete_item(item_id: int, db: Session = Depends(get_db)):
     if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
     db.delete(db_item)
+    db.commit()
+    return 
+
+# API endpoint to create an Institution
+@app.post("/institutions/", response_model=InstitutionResponse)
+async def create_Institution(institution: InstitutionCreate, db: Session = Depends(get_db)):
+	db_Institution = Institution(**institution.dict())
+	db.add(db_Institution)
+	db.commit()
+	db.refresh(db_Institution)
+	return db_Institution
+
+# API endpoint to update an Institution by ID
+@app.put("/institutions/{Institution_id}", response_model=InstitutionResponse)
+async def update_Institution(Institution_id: int, institution: InstitutionUpdate, db: Session = Depends(get_db)):
+    updated_Institution = db.query(Institution).filter(institution.id == Institution_id)
+    updated_Institution.first()
+    if updated_Institution is None:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    updated_Institution.update(institution.dict(), synchronize_session=False)
+    db.commit()
+    return updated_Institution.first()  # Refresh and return updated Institution
+
+# API endpoint to read an Institution by ID
+@app.get("/institutions/{Institution_id}", response_model=InstitutionResponse)
+async def read_Institution(Institution_id: int, db: Session = Depends(get_db)):
+	db_Institution = db.query(Institution).filter(Institution.id == Institution_id).first()
+	if db_Institution is None:
+		raise HTTPException(status_code=404, detail="Institution not found")
+	return db_Institution
+
+# API endpoint to retrieve all Institutions
+@app.get("/institutions/", response_model=List[InstitutionResponse])
+async def read_Institutions(db: Session = Depends(get_db)):
+    Institutions = db.query(Institution).all()
+    return Institutions
+
+@app.delete("/institutions/{Institution_id}", status_code=204)
+async def delete_Institution(Institution_id: int, db: Session = Depends(get_db)):
+    db_Institution = db.query(Institution).filter(Institution.id == Institution_id).first()
+    if db_Institution is None:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    db.delete(db_Institution)
     db.commit()
     return 
 
