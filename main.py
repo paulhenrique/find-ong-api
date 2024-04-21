@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List  # Import the List type
-from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse 
-from models import Item, Institution
+from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate 
+from models import Item, Institution, User
 from database import get_db
 
 
@@ -95,6 +95,50 @@ async def delete_Institution(Institution_id: int, db: Session = Depends(get_db))
     db.commit()
     return 
 
+# CRUD DE USUÁRIOS
+
+# API endpoint to create an user
+@app.post("/users/", response_model=UserResponse)
+async def create_user(user: UserCreate, db: Session = Depends(get_db)):
+	db_user = User(**user.dict())
+	db.add(db_user)
+	db.commit()
+	db.refresh(db_user)
+	return db_user
+
+# API endpoint to update an user by ID
+@app.put("/users/{user_id}", response_model=UserResponse)
+async def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
+    updated_user = db.query(User).filter(User.id == user_id)
+    updated_user.first()
+    if updated_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    updated_user.update(user.dict(), synchronize_session=False)
+    db.commit()
+    return updated_user.first()  # Refresh and return updated user
+
+# API endpoint to read an user by ID
+@app.get("/users/{user_id}", response_model=UserResponse)
+async def read_user(user_id: int, db: Session = Depends(get_db)):
+	db_user = db.query(User).filter(User.id == user_id).first()
+	if db_user is None:
+		raise HTTPException(status_code=404, detail="User not found")
+	return db_user
+
+# API endpoint to retrieve all users
+@app.get("/users/", response_model=List[UserResponse])
+async def read_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return users
+
+@app.delete("/users/{user_id}", status_code=204)
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(db_user)
+    db.commit()
+    return 
 
 
 
