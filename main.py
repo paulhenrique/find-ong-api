@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List  # Import the List type
-from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate, CommentCreate, CommentResponse, CommentUpdate 
-from models import Item, Institution, User, Comment
+from schemas import ItemCreate, ItemUpdate, ItemResponse, InstitutionCreate, InstitutionUpdate, InstitutionResponse, UserCreate, UserResponse, UserUpdate, CommentCreate, CommentResponse, CommentUpdate, PostCreate, PostResponse, PostUpdate
+from models import Item, Institution, User, Comment, Post
 from database import get_db
 
 
@@ -186,6 +186,53 @@ async def delete_comment(comment_id: int, db: Session = Depends(get_db)):
     db.commit()
     return 
 
+# API endpoint to create a post
+@app.post("/posts/", response_model=PostResponse)
+async def create_post(post: PostCreate, db: Session = Depends(get_db)):
+    db_post = Post(**post.dict())
+    db.add(db_post)
+    db.commit()
+    db.refresh(db_post)
+    return db_post
+
+
+# API endpoint to update a post by ID
+@app.put("/posts/{post_id}", response_model=PostResponse)
+async def update_post(post_id: int, post: PostUpdate, db: Session = Depends(get_db)):
+    updated_post = db.query(Post).filter(Post.id == post_id).first()
+    if updated_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    for key, value in post.dict().items():
+        setattr(updated_post, key, value)
+    db.commit()
+    return updated_post
+
+
+# API endpoint to read a post by ID
+@app.get("/posts/{post_id}", response_model=PostResponse)
+async def read_post(post_id: int, db: Session = Depends(get_db)):
+    db_post = db.query(Post).filter(Post.id == post_id).first()
+    if db_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return db_post
+
+
+# API endpoint to retrieve all posts
+@app.get("/posts/", response_model=List[PostResponse])
+async def read_posts(db: Session = Depends(get_db)):
+    posts = db.query(Post).all()
+    return posts
+
+
+# API endpoint to delete a post by ID
+@app.delete("/posts/{post_id}", status_code=204)
+async def delete_post(post_id: int, db: Session = Depends(get_db)):
+    db_post = db.query(Post).filter(Post.id == post_id).first()
+    if db_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    db.delete(db_post)
+    db.commit()
+    return
 
 if __name__ == "__main__":
 	import uvicorn
