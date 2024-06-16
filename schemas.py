@@ -19,55 +19,45 @@ class ItemResponse(BaseModel):
 
 # Pydantic model for request data
 class InstitutionCreate(BaseModel):
+	id: int
 	name: str
-	address: str
-	latitude: str
-	longitude: str
-	responsibleUserId: int
-	created: str
-	visitTime: str
-	visitDates: str
+	email: str
+	cnpj: str
+	password: str
 	
 # Pydantic model for request data
 class InstitutionUpdate(BaseModel):
+	id: int
 	name: str
-	address: str
-	latitude: str
-	longitude: str
-	responsibleUserId: int
-	created: str
-	visitTime: str
-	visitDates: str
+	email: str
+	cnpj: str
+	password: str
 
 # Pydantic model for response data
 class InstitutionResponse(BaseModel):
 	id: int
 	name: str
-	address: str
-	latitude: str
-	longitude: str
-	responsibleUserId: int
-	created: str
-	visitTime: str
-	visitDates: str
+	email: str
+	cnpj: str
+	password: str
 	
 class UserCreate(BaseModel):
 	name: str
 	email: str
-	socialUid: str
+	password: str
 	
 # Pydantic model for request data
 class UserUpdate(BaseModel):
 	name: str
 	email: str
-	socialUid: str
+	password: str
 
 # Pydantic model for response data
 class UserResponse(BaseModel):
 	id: int
 	name: str
 	email: str
-	socialUid: str
+	password: str
 	
 class CommentCreate(BaseModel):
 	userId: str
@@ -94,6 +84,7 @@ class PostCreate(BaseModel):
 	text: str
 	institutionId: str
 	timeStamp: str
+	imgLink: str
 	
 # Pydantic model for request data
 class PostUpdate(BaseModel):
@@ -101,6 +92,7 @@ class PostUpdate(BaseModel):
 	text: str
 	institutionId: str
 	timeStamp: str
+	imgLink: str
 
 # Pydantic model for response data
 class PostResponse(BaseModel):
@@ -109,6 +101,7 @@ class PostResponse(BaseModel):
 	text: str
 	institutionId: str
 	timeStamp: str
+	imgLink: str
 
 class PostLikesCreate(BaseModel):
 	userId: str
