@@ -1,4 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel as PydanticBaseModel
+
+class BaseModel(PydanticBaseModel):
+	class Config:
+		orm_mode = True
 
 # Pydantic model for request data
 class ItemCreate(BaseModel):
