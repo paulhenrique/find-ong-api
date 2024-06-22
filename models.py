@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -30,6 +30,27 @@ class User(Base):
 	username = Column(String)
 	email = Column(String)
 	password = Column(String)
+	posts = relationship("Post", back_populates="user")
+	comments = relationship("Comment", back_populates="user")
+	likes = relationship("PostLikes", back_populates="user")
+
+	isInstitution = Column(Boolean, default=False)
+	cnpj = Column(String, default="")
+	
+# Database posts model
+class Post(Base):
+	__tablename__ = "posts"
+	id = Column(Integer, primary_key=True, index=True)
+	userId = userId = Column(Integer, ForeignKey('users.id')) # Adiciona relacionamento
+	institutionId = institutionId = Column(Integer, ForeignKey('institutions.id')) # Adiciona relacionamento
+	text = Column(String)
+	title = Column(String)
+	timeStamp = Column(String)
+	imgLink = Column(String)
+
+	user = relationship("User", back_populates="posts")
+	comments = relationship("Comment", back_populates="post")
+	likes = relationship("PostLikes", back_populates="post")
 
 
 # Database comment  model
@@ -40,17 +61,9 @@ class Comment(Base):
 	comment = Column(String)
 	postId = Column(Integer, ForeignKey('posts.id')) # Adiciona relacionamento
 	timeStamp = Column(String)
-	
-# Database posts model
-class Post(Base):
-	__tablename__ = "posts"
-	id = Column(Integer, primary_key=True, index=True)
-	userId = userId = Column(Integer, ForeignKey('users.id')) # Adiciona relacionamento
-	institutionId = institutionId = Column(Integer, ForeignKey('institutions.id')) # Adiciona relacionamento
-	text = Column(String)
-	timeStamp = Column(String)
-	imgLink = Column(String)
 
+	user = relationship(User, back_populates="comments")
+	post = relationship(Post, back_populates="comments")
 
 # Database PostLikes model
 class PostLikes(Base):
@@ -59,6 +72,9 @@ class PostLikes(Base):
 	userId = userId = Column(Integer, ForeignKey('users.id')) # Adiciona relacionamento
 	postId = postId = Column(Integer, ForeignKey('posts.id')) # Adiciona relacionamento
 	timeStamp = Column(String)
+	
+	post = relationship(Post, back_populates="likes")
+	user = relationship(User, back_populates="likes")
 
 
 # Database UserFavorites model
@@ -67,4 +83,3 @@ class UserFavorites(Base):
 	id = Column(Integer, primary_key=True, index=True)
 	userId = userId = Column(Integer, ForeignKey('users.id')) # Adiciona relacionamento
 	institutionId = institutionId = Column(Integer, ForeignKey('institutions.id')) # Adiciona relacionamento
-
