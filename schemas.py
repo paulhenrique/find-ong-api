@@ -48,12 +48,14 @@ class InstitutionResponse(BaseModel):
 class UserCreate(BaseModel):
 	name: str
 	email: str
+	username: str
 	password: str
 	
 # Pydantic model for request data
 class UserUpdate(BaseModel):
 	name: str
 	email: str
+	username: str
 	password: str
 
 # Pydantic model for response data
